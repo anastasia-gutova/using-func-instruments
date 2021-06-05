@@ -1,10 +1,16 @@
 var tab1Array;
 
+function forEach(arraySet, callback) {
+  for(let i=0; i<arraySet.length; i += 1) {
+    callback(i);
+  }
+}
+
 function createArrayCopy(array) {
   var copyArray = new Array(array.length);
-  for (var i = 0; i < array.length; i += 1) {
-    copyArray[i] = array[i].slice();
-  }
+  forEach(copyArray, function(index){
+    copyArray[index] = array[index].slice();
+  })
   return copyArray
 }
 
@@ -29,6 +35,7 @@ function setInputValue(inputSelector, newValue) {
 
 function tableRowsProcessing() {
   tab1Array = fillArray(cleanArray());
+
   $.each([1, 2, 3, 4, 5], function (rowIndex, num) {
     getAllRowInputsByRowNum(num).each(function (column, el) {
       inputsActions(el, tab1Array, rowIndex, column);
@@ -142,9 +149,9 @@ function getNonFinite(result) {
 // Суммирование элементов строки
 function getSumRow(array, rowNum) {
   var sum = 0;
-  for (element in array[rowNum - 1]) {
-    sum += isNaN(array[rowNum - 1][element]) ? 0 : array[rowNum - 1][element];
-  }
+  forEach(array[rowNum - 1], function(index){
+    sum += isNaN(array[rowNum - 1][index]) ? 0 : array[rowNum - 1][index];
+  })
   return sum
 }
 
