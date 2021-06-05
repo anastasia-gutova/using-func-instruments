@@ -36,9 +36,9 @@ function setInputValue(inputSelector, newValue) {
 function tableRowsProcessing() {
   tab1Array = fillArray(cleanArray());
 
-  $.each([1, 2, 3, 4, 5], function (rowIndex, num) {
-    getAllRowInputsByRowNum(num).each(function (column, el) {
-      inputsActions(el, tab1Array, rowIndex, column);
+  forEach([1, 2, 3, 4, 5], function (index) {
+    getAllRowInputsByRowNum(index + 1).each(function (column, el) {
+      inputsActions(el, tab1Array, index, column);
     });
   });
 }
@@ -56,9 +56,9 @@ function tableOnElementKeyUp(element, array, rowIndex, column) {
 
 function fillArray(array) {
   var arrayCopy = createArrayCopy(array);
-  $.each([1, 2, 3, 4, 5], function (rowIndex, num) {
-    getAllRowInputsByRowNum(num).each(function (column, el) {
-      arrayCopy[rowIndex][column] = parseFloat(getInputValue(el));
+  forEach([1, 2, 3, 4, 5], function (index) {
+    getAllRowInputsByRowNum(index + 1).each(function (column, el) {
+      arrayCopy[index][column] = parseFloat(getInputValue(el));
     });
   });
   return arrayCopy;
