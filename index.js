@@ -6,6 +6,12 @@ function forEach(arraySet, callback) {
   }
 }
 
+function withArrayCopy(array, callback) {
+  var arrayCopy = createArrayCopy(array);
+  callback(arrayCopy);
+  return arrayCopy;
+}
+
 function createArrayCopy(array) {
   var copyArray = new Array(array.length);
   forEach(copyArray, function(index){
@@ -50,18 +56,18 @@ function inputsActions(el, array, rowIndex, column) {
 }
 
 function tableOnElementKeyUp(element, array, rowIndex, column) {
-    array = updateArrayCell(element, array, rowIndex, column);
+    array = setArrayValue( array, rowIndex, column, parseFloat(getInputValue(element)));
     updateConnectedCells(array, rowIndex, column);
 }
 
 function fillArray(array) {
-  var arrayCopy = createArrayCopy(array);
-  forEach([1, 2, 3, 4, 5], function (index) {
-    getAllRowInputsByRowNum(index + 1).each(function (column, el) {
-      arrayCopy[index][column] = parseFloat(getInputValue(el));
+  return withArrayCopy(array, function(arrayCopy) {
+    forEach([1, 2, 3, 4, 5], function (index) {
+      getAllRowInputsByRowNum(index + 1).each(function (column, el) {
+        arrayCopy[index][column] = parseFloat(getInputValue(el));
+      });
     });
-  });
-  return arrayCopy;
+  })
 }
 
 // Очищение массива значений
@@ -94,36 +100,29 @@ function tableOnElementChange(element) {
   }
 }
 
-// Обновляет элементы массива
-function updateArrayCell(element, array, rowIndex, column) {
-  var arrayCopy = createArrayCopy(array);
-  arrayCopy[rowIndex][column] = parseFloat(getInputValue(element));
-  return arrayCopy;
-}
-
 function getArrayValue(array, row, col) {
   return array[row][col];
 }
 
 function setArrayValue(array, row, col, newValue) {
-  var copyArray = createArrayCopy(array);
-  copyArray[row][col] = newValue;
-  return copyArray;
+  return withArrayCopy(array, function (arrayCopy) {
+    arrayCopy[row][col] = newValue;
+  });
 }
 
 function updateConnectedCells(array, rowIndex, column) {
-  var arrayCopy = createArrayCopy(array);
-  if (rowIndex == 0 || rowIndex == 2 || rowIndex == 4) {
-    var columnNum = (column + 1);
-    var resultRow2 = getNewCalculatedValues(getArrayValue(arrayCopy, 0, column), getArrayValue(arrayCopy, 2, column), getArrayValue(arrayCopy, 4, column), 0);
-    var resultRow4 = getNewCalculatedValues(getArrayValue(arrayCopy, 0, column), getArrayValue(arrayCopy, 2, column), getArrayValue(arrayCopy, 4, column), 1);
-    setInputValue(getInputByRowAndColumn(2, columnNum), resultRow2);
-    setInputValue(getInputByRowAndColumn(4, columnNum), resultRow4);
-
-    arrayCopy = setArrayValue(arrayCopy, 1, column, resultRow2);
-    arrayCopy = setArrayValue(arrayCopy, 3, column, resultRow4);
-  }
-  return arrayCopy
+  return withArrayCopy(array, function () {
+    if (rowIndex == 0 || rowIndex == 2 || rowIndex == 4) {
+      var columnNum = (column + 1);
+      var resultRow2 = getNewCalculatedValues(getArrayValue(arrayCopy, 0, column), getArrayValue(arrayCopy, 2, column), getArrayValue(arrayCopy, 4, column), 0);
+      var resultRow4 = getNewCalculatedValues(getArrayValue(arrayCopy, 0, column), getArrayValue(arrayCopy, 2, column), getArrayValue(arrayCopy, 4, column), 1);
+      setInputValue(getInputByRowAndColumn(2, columnNum), resultRow2);
+      setInputValue(getInputByRowAndColumn(4, columnNum), resultRow4);
+  
+      arrayCopy = setArrayValue(arrayCopy, 1, column, resultRow2);
+      arrayCopy = setArrayValue(arrayCopy, 3, column, resultRow4);
+    }
+  })
 }
 
 function getNewCalculatedValues(valueRow1, valueRow3, valueRow5, parType) {
