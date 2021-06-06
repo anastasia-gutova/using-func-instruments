@@ -43,7 +43,7 @@ function tableRowsProcessing() {
   tab1Array = fillArray(cleanArray());
 
   forEach([1, 2, 3, 4, 5], function (index) {
-    getAllRowInputsByRowNum(index + 1).each(function (column, el) {
+    forEach(getAllRowInputsByRowNum(index + 1), function (column) {
       inputsActions(el, tab1Array, index, column);
     });
   });
@@ -63,7 +63,7 @@ function tableOnElementKeyUp(element, array, rowIndex, column) {
 function fillArray(array) {
   return withArrayCopy(array, function(arrayCopy) {
     forEach([1, 2, 3, 4, 5], function (index) {
-      getAllRowInputsByRowNum(index + 1).each(function (column, el) {
+      forEach(getAllRowInputsByRowNum(index + 1), function (column) {
         arrayCopy[index][column] = parseFloat(getInputValue(el));
       });
     });
@@ -83,9 +83,9 @@ function cleanArray() {
 
 // Метод для очищения нулевого значения в input
 function tableOnElementClick(element) {
-  if (getInputValue(element) == 0) {
+  when(getInputValue(element) == 0, function () {
     setInputValue(element, '');
-  }
+  });
 }
 
 function isAddZero(value) {
@@ -95,9 +95,9 @@ function isAddZero(value) {
 // Дописывает 0 для ситуации ввода числа ".5"
 function tableOnElementChange(element) {
   var currentElementValue = getInputValue(element);
-  if (isAddZero(currentElementValue)) {
+  when (isAddZero(currentElementValue), function() {
     setInputValue(element, "0" + currentElementValue);
-  }
+  });
 }
 
 function getArrayValue(array, row, col) {
@@ -112,7 +112,7 @@ function setArrayValue(array, row, col, newValue) {
 
 function updateConnectedCells(array, rowIndex, column) {
   return withArrayCopy(array, function () {
-    if (rowIndex == 0 || rowIndex == 2 || rowIndex == 4) {
+    when(rowIndex == 0 || rowIndex == 2 || rowIndex == 4, function () {
       var columnNum = (column + 1);
       var resultRow2 = getNewCalculatedValues(getArrayValue(arrayCopy, 0, column), getArrayValue(arrayCopy, 2, column), getArrayValue(arrayCopy, 4, column), 0);
       var resultRow4 = getNewCalculatedValues(getArrayValue(arrayCopy, 0, column), getArrayValue(arrayCopy, 2, column), getArrayValue(arrayCopy, 4, column), 1);
@@ -121,23 +121,38 @@ function updateConnectedCells(array, rowIndex, column) {
   
       arrayCopy = setArrayValue(arrayCopy, 1, column, resultRow2);
       arrayCopy = setArrayValue(arrayCopy, 3, column, resultRow4);
-    }
+    });
   })
 }
 
-function getNewCalculatedValues(valueRow1, valueRow3, valueRow5, parType) {
-  if (parType == 0) {
-    var notNanValue1 = isNaN(valueRow1) ? 0 : valueRow1;
-    var notNanValue3 = isNaN(valueRow3) ? 0 : valueRow3;
-    var result2 = notNanValue1 / notNanValue3;
-    return getNonFinite(result2);
-  } else if (parType == 1) {
-    var notNanValue1 = isNaN(valueRow1) ? 0 : valueRow1;
-    var notNanValue5 = isNaN(valueRow5) ? 0 : valueRow5;
-    var result2 = notNanValue1 / notNanValue3;
-    var result4 = result2 - (notNanValue1 / notNanValue5);
-    return getNonFinite(result4)
+function when(condition, callback) {
+  if (condition) {
+    return callback();
+  } 
+}
+
+function IF(condition, callbackTrue, callbackFalse) {
+  if (condition) {
+    return callbackTrue();
+  } else {
+    return callbackFalse();
   }
+}
+
+function getNewCalculatedValues(valueRow1, valueRow3, valueRow5, parType) {
+  return IF(parType == 0,
+    function () {
+      return getNonFinite(devideTwoNumbers(valueRow1, valueRow3));
+  },
+    function () {
+      return getNonFinite(devideTwoNumbers(valueRow1, valueRow3) - devideTwoNumbers(valueRow1, valueRow5))
+  });
+}
+
+function devideTwoNumbers (number1, number2) {
+  var notNanValue1 = isNaN(number1) ? 0 : number1;
+  var notNanValue2 = isNaN(number2) ? 0 : number2;
+  return notNanValue1 / notNanValue2;
 }
 
 // Возвращает конечное число
