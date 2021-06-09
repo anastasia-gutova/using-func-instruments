@@ -20,15 +20,8 @@ function createArrayCopy(array) {
   return copyArray
 }
 
-function getAllRowInputsByRowNum(num) {
-  return $("[id*='floatInput" + num + "']")
-}
-
-function getInputByRowAndColumn(rowNum, colNum) {
-  return $("[id='floatInput" + rowNum + "_" + colNum + "']")
-}
-function getTotalByRowNum(rowNum) {
-  return $("[id='totalRoad" + rowNum + " ']")
+function getAllElementsByTypeRowCol(type, rowNum = "", colNum = "", strictMode = true) {
+  return $("[id" + (strictMode ? "" : "*") + "=" + type + rowNum + (colNum !== "" ? "_" + colNum : "" ) +"]")
 }
 
 function getInputValue(inputSelector) {
@@ -43,7 +36,7 @@ function tableRowsProcessing() {
   tab1Array = fillArray(cleanArray());
 
   forEach([1, 2, 3, 4, 5], function (index) {
-    forEach(getAllRowInputsByRowNum(index + 1), function (column) {
+    forEach(getAllElementsByTypeRowCol('floatInput', index + 1, '', false), function (column) {
       inputsActions(el, tab1Array, index, column);
     });
   });
@@ -63,7 +56,7 @@ function tableOnElementKeyUp(element, array, rowIndex, column) {
 function fillArray(array) {
   return withArrayCopy(array, function(arrayCopy) {
     forEach([1, 2, 3, 4, 5], function (index) {
-      forEach(getAllRowInputsByRowNum(index + 1), function (column) {
+      forEach(getAllElementsByTypeRowCol('floatInput', index + 1, '', false), function (column) {
         arrayCopy[index][column] = parseFloat(getInputValue(el));
       });
     });
@@ -116,8 +109,8 @@ function updateConnectedCells(array, rowIndex, column) {
       var columnNum = (column + 1);
       var resultRow2 = getNewCalculatedValues(getArrayValue(arrayCopy, 0, column), getArrayValue(arrayCopy, 2, column), getArrayValue(arrayCopy, 4, column), 0);
       var resultRow4 = getNewCalculatedValues(getArrayValue(arrayCopy, 0, column), getArrayValue(arrayCopy, 2, column), getArrayValue(arrayCopy, 4, column), 1);
-      setInputValue(getInputByRowAndColumn(2, columnNum), resultRow2);
-      setInputValue(getInputByRowAndColumn(4, columnNum), resultRow4);
+      setInputValue(getAllElementsByTypeRowCol('floatInput', 2, columnNum), resultRow2);
+      setInputValue(getAllElementsByTypeRowCol('floatInput', 4, columnNum), resultRow4);
   
       arrayCopy = setArrayValue(arrayCopy, 1, column, resultRow2);
       arrayCopy = setArrayValue(arrayCopy, 3, column, resultRow4);
