@@ -152,13 +152,3 @@ function devideTwoNumbers (number1, number2) {
 function getNonFinite(result) {
   return isFinite(result) ? Math.round(result) : 0;
 }
-
-// Суммирование элементов строки
-function getSumRow(array, rowNum) {
-  var sum = 0;
-  forEach(array[rowNum - 1], function(index){
-    sum += isNaN(array[rowNum - 1][index]) ? 0 : array[rowNum - 1][index];
-  })
-  return sum
-}
-
