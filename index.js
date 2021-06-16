@@ -42,13 +42,12 @@ function isAddZero(value) { // вычисление
 }
 
 function updateConnectedValues(array, rowIndex, column) { // вычисление
-  return withArrayCopy(array, function (arrayCopy) {
-    if (rowIndex == 0 || rowIndex == 2 || rowIndex == 4) {
-      arrayCopy[1][column] = getNewCalculatedValues(arrayCopy[0][column], arrayCopy[2][column], arrayCopy[4][column], 0);
-      arrayCopy[3][column] = getNewCalculatedValues(arrayCopy[0][column], arrayCopy[2][column], arrayCopy[4][column], 1);
-    }
-    return arrayCopy
-  })
+  let result = null;
+  if (rowIndex == 0 || rowIndex == 2 || rowIndex == 4) {
+    result = updateArrayValue(1, column, getNewCalculatedValues(array[0][column], array[2][column], array[4][column], 0), array);
+    result = updateArrayValue(3, column, getNewCalculatedValues(array[0][column], array[2][column], array[4][column], 1), result);
+  }
+  return result
 }
 
 function getNewCalculatedValues(valueRow1, valueRow3, valueRow5, parType) { // вычисление
